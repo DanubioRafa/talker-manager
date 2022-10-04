@@ -71,10 +71,16 @@ const validateLogin = (req, res, next) => {
   if (body.password.length < 6) {
     return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
   }
+
+  next();
 };
 
-app.post('/login', validateLogin, async (req, res) => {
+app.post('/login', validateLogin, async (_req, res) => {
   const token = createToken();
 
   res.status(200).json({ token });
+});
+
+app.post('/talker', async (req, res) => {
+  
 });
