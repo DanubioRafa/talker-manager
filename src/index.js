@@ -45,3 +45,19 @@ app.get('/talker/:id', async (req, res) => {
     console.log(`Erro na leitura do arquivo ${error}`);
   }
 });
+
+const createToken = () => {
+  let token = '';
+  for (let index = 0; index < 16; index += 1) {
+    const randomChar = Math.floor(Math.random() * 10);
+    token += (randomChar);
+  }
+
+  return token;
+};
+
+app.post('/login', async (req, res) => {
+  const token = createToken();
+
+  res.status(200).json({ token });
+});
