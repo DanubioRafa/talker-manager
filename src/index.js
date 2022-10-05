@@ -163,3 +163,18 @@ app.post('/talker', validateToken, validateFields, validateTalker,
     fs.writeFile(`${__dirname}/talker.json`, allTalkers);
     return res.status(201).json(newTalker);
 });
+
+app.put('/talker/:id', validateToken, validateFields, validateTalker,
+validateRate, validateFormatDate, async (req, res) => {
+  const parseTalkerArchive = await readFile();
+  const { params: { id }, body } = req;
+  const paramId = Number(id);
+
+  const indexOfId = parseTalkerArchive.findIndex((talker) => talker.id === paramId);
+  parseTalkerArchive.splice(indexOfId, 1, { id: paramId, ...body });
+  const newTalker = parseTalkerArchive[indexOfId];
+  const newTalkerArchive = JSON.stringify(parseTalkerArchive);
+
+  await fs.writeFile(`${__dirname}/talker.json`, newTalkerArchive);
+  res.status(200).json(newTalker);
+});
