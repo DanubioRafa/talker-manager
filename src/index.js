@@ -164,6 +164,11 @@ app.post('/talker', validateToken, validateFields, validateTalker,
     return res.status(201).json(newTalker);
 });
 
+const writeOnFile = async (newFile) => {
+  const newTalkerArchive = JSON.stringify(newFile);
+  await fs.writeFile(`${__dirname}/talker.json`, newTalkerArchive);
+};
+
 app.put('/talker/:id', validateToken, validateFields, validateTalker,
 validateRate, validateFormatDate, async (req, res) => {
   const parseTalkerArchive = await readFile();
@@ -173,8 +178,19 @@ validateRate, validateFormatDate, async (req, res) => {
   const indexOfId = parseTalkerArchive.findIndex((talker) => talker.id === paramId);
   parseTalkerArchive.splice(indexOfId, 1, { id: paramId, ...body });
   const newTalker = parseTalkerArchive[indexOfId];
-  const newTalkerArchive = JSON.stringify(parseTalkerArchive);
 
-  await fs.writeFile(`${__dirname}/talker.json`, newTalkerArchive);
+  writeOnFile(parseTalkerArchive);
+  
   res.status(200).json(newTalker);
+});
+
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const parseTalkerArchive = await readFile();
+  const { params: { id } } = req;
+  const paramId = Number(id);
+  const indexOfId = parseTalkerArchive.findIndex((talker) => talker.id === paramId);
+  parseTalkerArchive.splice(indexOfId, 1);
+
+  await writeOnFile(parseTalkerArchive);
+  res.status(204).json({ message: 'Talker excluido' });
 });
